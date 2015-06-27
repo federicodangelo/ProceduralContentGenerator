@@ -59,12 +59,9 @@ public class PCGViewEditor : Editor
             if (texture)
             {
                 EditorGUILayout.LabelField(new GUIContent("Result"), new GUIContent(texture), GUILayout.MaxHeight(texture.height));
-                EditorGUILayout.LabelField("Hello", "World");
 
                 //Rect rect = EditorGUILayout.GetControlRect(true, texture.height);
-
                 //EditorGUI.DrawTextureTransparent(rect, texture, ScaleMode.ScaleToFit);
-                
             }
         }
     }

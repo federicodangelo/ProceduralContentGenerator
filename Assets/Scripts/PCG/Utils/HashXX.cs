@@ -37,7 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 namespace PCG
 {
-    public class XXHashRandomGenerator
+    public class HashXX
     {
         const uint PRIME32_1 = 2654435761U;
         const uint PRIME32_2 = 2246822519U;
@@ -48,6 +48,11 @@ namespace PCG
         static public int Range (uint seed, int min, int max, int x, int y) 
         {
             return min + (int)(GetRandom (seed, x, y) % (max - min));
+        }
+
+        static public int Range (uint seed, int min, int max, int x) 
+        {
+            return min + (int)(GetRandom (seed, x) % (max - min));
         }
 
         static public uint GetRandom(uint seed, int buf1, int buf2)

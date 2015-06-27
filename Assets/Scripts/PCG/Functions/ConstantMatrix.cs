@@ -4,14 +4,7 @@ namespace PCG
 {
     public class ConstantMatrix : FunctionMatrix
     {
-        private int size;
         private int value;
-
-        public int Size
-        {
-            get { return size; }
-            set { size = value; }
-        }
 
         public int Value
         {
@@ -29,7 +22,7 @@ namespace PCG
                 //Input
                 new ParameterDefinition[] { },
                 //Output
-                "matrix", 0, 255
+                "matrix", size, 0, 255
             )
         {
             this.size = size;
@@ -39,11 +32,6 @@ namespace PCG
         protected override int OnEvaluateMatrix(Function[] inputValues, int x, int y)
         {
             return value;
-        }
-
-        protected override int OnEvaluateMatrixSize(Function[] inputValues)
-        {
-            return size;
         }
 
         public override string ToString()

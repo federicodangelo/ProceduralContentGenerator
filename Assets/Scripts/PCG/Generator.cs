@@ -23,7 +23,9 @@ namespace PCG
 
             //return new FunctionChainBuilder().AddFunction(new ConstantMatrix(256, 255)).Finish();
 
-            return new FunctionChainBuilder().AddFunction(new RandomMatrix(256, 3333, 0, 255)).Finish();
+            //return new FunctionChainBuilder().AddFunction(new RandomMatrix(256, 3333, 0, 255)).Finish();
+
+            return new FunctionChainBuilder().AddFunction(new MidPointMatrix(256, 3333, 0, 255)).Finish();
         }
     }
 }
