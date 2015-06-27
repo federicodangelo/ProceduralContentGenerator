@@ -7,9 +7,25 @@ namespace PCG
         private int size;
         private int value;
 
+        public int Size
+        {
+            get { return size; }
+            set { size = value; }
+        }
+
+        public int Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
+
+        public ConstantMatrix() : this(0, 0)
+        {
+        }
+
         public ConstantMatrix(int size, int value) :
             base(
-                "ConstantMatrix " + size + "x" + size + " -> " + value,
+                "ConstantMatrix",
                 //Input
                 new ParameterDefinition[] { },
                 //Output
@@ -22,13 +38,17 @@ namespace PCG
 
         protected override int OnEvaluateMatrix(Function[] inputValues, int x, int y)
         {
-            return UnityEngine.Random.Range(0, 255);
-            //return value;
+            return value;
         }
 
         protected override int OnEvaluateMatrixSize(Function[] inputValues)
         {
             return size;
+        }
+
+        public override string ToString()
+        {
+            return "ConstantMatrix " + size + "x" + size + " -> " + value;
         }
     }
 }

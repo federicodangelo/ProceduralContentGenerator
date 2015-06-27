@@ -6,9 +6,19 @@ namespace PCG
     {
         private int value;
 
+        public int Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+        }
+
+        public ConstantNumber() : this(0)
+        {
+        }
+
         public ConstantNumber(int value) :
             base(
-                "ConstantNumber(" + value + ")",
+                "ConstantNumber",
                 //Input
                 new ParameterDefinition[] { },
                 //Output
@@ -21,6 +31,11 @@ namespace PCG
         protected override int OnEvaluateNumber(Function[] inputValues)
         {
             return value;
+        }
+
+        public override string ToString()
+        {
+            return "ConstantNumber " + value;
         }
     }
 }
