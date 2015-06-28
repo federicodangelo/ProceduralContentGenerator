@@ -28,7 +28,8 @@ namespace PCG
         private CombinatorFunction combinatorFunction;
         private DistanceFunction distanceFunction;
 
-        private VoronoiNoise generator;
+        //private VoronoiNoise generator;
+        private VoronoiNoiseFixed generator;
         
         public int Seed
         {
@@ -106,7 +107,7 @@ namespace PCG
         {
             if (generator == null)
             {
-                generator = new VoronoiNoise(seed);
+                generator = new VoronoiNoiseFixed(seed);
 
                 switch(combinatorFunction)
                 {
@@ -136,7 +137,7 @@ namespace PCG
                 
             }
 
-            return min + (int) (generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min));
+            return min + (generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp)) * fint.CreateFromInt(max - min)).ToInt();
         }
 
         public override string ToString()
