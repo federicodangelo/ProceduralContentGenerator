@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEditor;
 using PCG;
 using System.Collections.Generic;
+using System.Reflection;
 
 [CustomEditor(typeof(FunctionView))]
 public class PCGViewEditor : Editor
@@ -21,11 +22,13 @@ public class PCGViewEditor : Editor
         
         Function function = view.GetFunction();
 
+        string fullFunctionText = view.functionText + "(" + view.extraParameters + ")";
+
         object result = null;
 
         for (int i = 0; i < cachedFunctionResults.Count; i++)
         {
-            if (cachedFunctionResults[i].Key == view.functionText)
+            if (cachedFunctionResults[i].Key == fullFunctionText)
             {
                 result = cachedFunctionResults[i].Value;
                 break;
@@ -35,11 +38,49 @@ public class PCGViewEditor : Editor
         if (result == null)
         {
             if (function != null)
-                result = function.Evaluate();
-            else
-                result = "ERROR!!";
+            {
+                string[] kvParameters = view.extraParameters.Split(new char[] {','}, System.StringSplitOptions.RemoveEmptyEntries);
 
-            cachedFunctionResults.Add(new KeyValuePair<string, object>(view.functionText, result));
+                for (int i = 0; i < kvParameters.Length; i++ )
+                {
+                    if (kvParameters[i].IndexOf('=') > 0)
+                    {
+                        string[] s = kvParameters[i].Split(new char[] { '=' });
+
+                        if (s.Length == 2)
+                        {
+                            string parameter = s[0];
+                            string value = s[1];
+
+                            PropertyInfo property = function.GetType().GetProperty(parameter, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
+
+                            if (property != null)
+                            {
+                                if (property.PropertyType == typeof(int))
+                                {
+                                    int intValue;
+                                    if (int.TryParse(value, out intValue))
+                                        property.SetValue(function, intValue, null);
+                                }
+                                else if (property.PropertyType == typeof(float))
+                                {
+                                    float floatValue;
+                                    if (float.TryParse(value, out floatValue))
+                                        property.SetValue(function, floatValue, null);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                result = function.Evaluate();
+            }
+            else
+            {
+                result = "ERROR!!";
+            }
+
+            cachedFunctionResults.Add(new KeyValuePair<string, object>(fullFunctionText, result));
 
             if (cachedFunctionResults.Count > MAX_CACHED_RESULTS)
                 cachedFunctionResults.RemoveAt(0);
@@ -63,8 +104,11 @@ public class PCGViewEditor : Editor
             for (int i = 0; i < matrix.size * matrix.size; i++)
                 colors[i] = new Color32(matrix.values[i], matrix.values[i], matrix.values[i], 0);
 
-            texture.SetPixels32(colors);
-            texture.Apply();
+            if (colors.Length > 0)
+            {
+                texture.SetPixels32(colors);
+                texture.Apply();
+            }
 
             //EditorGUILayout.LabelField("Result", "See in preview");
 
