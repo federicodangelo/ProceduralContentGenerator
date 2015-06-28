@@ -4,6 +4,8 @@ namespace PCG
 {
     public class MidPointMatrix : FunctionMatrix
     {
+        public const string NAME = "MidPointMatrix";
+
         private int seed;
         private int min;
         private int max;
@@ -27,17 +29,18 @@ namespace PCG
             set { this.max = value; }
         }
         
-        public MidPointMatrix() : this(0, 0, 0, 255)
+        public MidPointMatrix() 
+            : this(256, 0, 0, 255)
         {
         }
         
         public MidPointMatrix(int size, int seed, int min, int max) :
             base(
-                "RandomMatrix",
+                NAME,
                 //Input
                 new ParameterDefinition[] { },
-            //Output
-            "x", size, Int32.MinValue, Int32.MaxValue
+                //Output
+                "x", size, Int32.MinValue, Int32.MaxValue
             )
         {
             this.seed = seed;
@@ -58,7 +61,7 @@ namespace PCG
 
         public override string ToString()
         {
-            return "RandomMatrix " + size + "x" + size + " -> [" + min + ".." + max + "]";
+            return NAME + " " + size + "x" + size + " -> [" + min + ".." + max + "]";
         }
     }
 }

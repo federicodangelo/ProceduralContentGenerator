@@ -4,6 +4,8 @@ namespace PCG
 {
     public class RandomMatrix : FunctionMatrix
     {
+        public const string NAME = "RandomMatrix";
+
         private int seed;
         private int min;
         private int max;
@@ -26,13 +28,14 @@ namespace PCG
             set { this.max = value; }
         }
 
-        public RandomMatrix() : this(0, 0, 0, 255)
+        public RandomMatrix()
+            : this(256, 0, 0, 255)
         {
         }
         
         public RandomMatrix(int size, int seed, int min, int max) :
             base(
-                "RandomMatrix",
+                NAME,
                 //Input
                 new ParameterDefinition[] { },
                 //Output
@@ -51,7 +54,7 @@ namespace PCG
         
         public override string ToString()
         {
-            return "RandomMatrix " + size + "x" + size + " -> [" + min + ".." + max + "]";
+            return NAME + " " + size + "x" + size + " -> [" + min + ".." + max + "]";
         }
     }
 }

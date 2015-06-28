@@ -4,6 +4,8 @@ namespace PCG
 {
     public class ConstantNumber : FunctionNumber
     {
+        public const string NAME = "ConstantNumber";
+
         private int value;
 
         public int Value
@@ -12,13 +14,14 @@ namespace PCG
             set { this.value = value; }
         }
 
-        public ConstantNumber() : this(0)
+        public ConstantNumber() 
+            : this(0)
         {
         }
 
         public ConstantNumber(int value) :
             base(
-                "ConstantNumber",
+                NAME,
                 //Input
                 new ParameterDefinition[] { },
                 //Output
@@ -35,7 +38,7 @@ namespace PCG
 
         public override string ToString()
         {
-            return "ConstantNumber " + value;
+            return NAME + " " + value;
         }
     }
 }

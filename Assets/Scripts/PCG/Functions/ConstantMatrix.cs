@@ -4,6 +4,8 @@ namespace PCG
 {
     public class ConstantMatrix : FunctionMatrix
     {
+        public const string NAME = "ConstantMatrix";
+
         private int value;
 
         public int Value
@@ -12,7 +14,8 @@ namespace PCG
             set { this.value = value; }
         }
 
-        public ConstantMatrix() : this(0, 0)
+        public ConstantMatrix() 
+            : this(256, 0)
         {
         }
 
@@ -36,7 +39,7 @@ namespace PCG
 
         public override string ToString()
         {
-            return "ConstantMatrix " + size + "x" + size + " -> " + value;
+            return NAME + " " + size + "x" + size + " -> " + value;
         }
     }
 }

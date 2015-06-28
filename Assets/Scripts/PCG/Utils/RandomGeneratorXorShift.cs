@@ -17,6 +17,9 @@ namespace PCG
         
         public RandomGeneratorXorShift (int seed) 
         {
+            if (seed == 0)
+                seed = 31415;
+
             state = (uint)seed;
         }
 

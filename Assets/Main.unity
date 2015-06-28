@@ -96,8 +96,10 @@ GameObject:
   m_Component:
   - 4: {fileID: 187073321}
   - 114: {fileID: 187073320}
+  - 114: {fileID: 187073323}
+  - 114: {fileID: 187073322}
   m_Layer: 0
-  m_Name: PCGView
+  m_Name: FunctionView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -114,7 +116,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a5ac376b626894468ba4cbaee3c1ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  functionText: aaaadasdassasadsadsadasdasdas
+  functionText: VoronoiNoiseMatrix
 --- !u!4 &187073321
 Transform:
   m_ObjectHideFlags: 0
@@ -127,6 +129,30 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
+--- !u!114 &187073322
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 187073319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a5ac376b626894468ba4cbaee3c1ec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  functionText: PerlinNoiseMatrix
+--- !u!114 &187073323
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 187073319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a5ac376b626894468ba4cbaee3c1ec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  functionText: MidPointMatrix
 --- !u!1 &1391536973
 GameObject:
   m_ObjectHideFlags: 0
