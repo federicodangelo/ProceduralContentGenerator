@@ -96,7 +96,7 @@ namespace PCG
                 //Input
                 new ParameterDefinition[] { },
                 //Output
-                "x", size, Int32.MinValue, Int32.MaxValue
+                "x", size, 0, 255
             )
         {
             this.seed = seed;

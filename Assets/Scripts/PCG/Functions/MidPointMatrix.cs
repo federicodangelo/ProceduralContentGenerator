@@ -7,8 +7,8 @@ namespace PCG
         public const string NAME = "MidPointMatrix";
 
         private int seed;
-        private int min;
-        private int max;
+        private int roughness;
+
         private Matrix matrix;
         
         public int Seed
@@ -16,36 +16,29 @@ namespace PCG
             get { return seed; }
             set { seed = value; }
         }
-        
-        public int Min
+
+        public int Roughness
         {
-            get { return this.min; }
-            set { this.min = value; }
+            get { return roughness; }
+            set { roughness = value; }
         }
-        
-        public int Max
-        {
-            get { return this.max; }
-            set { this.max = value; }
-        }
-        
+
         public MidPointMatrix() 
-            : this(256, 0, 0, 255)
+            : this(256, 0, 1)
         {
         }
         
-        public MidPointMatrix(int size, int seed, int min, int max) :
+        public MidPointMatrix(int size, int seed, int roughness) :
             base(
                 NAME,
                 //Input
                 new ParameterDefinition[] { },
                 //Output
-                "x", size, Int32.MinValue, Int32.MaxValue
+                "x", size, 0, 255
             )
         {
             this.seed = seed;
-            this.min = min;
-            this.max = max;
+            this.roughness = roughness;
         }
         
         protected override int OnEvaluateMatrix(Function[] inputValues, int x, int y)
@@ -53,7 +46,7 @@ namespace PCG
             if (matrix == null)
             {
                 matrix = new Matrix(size);
-                PlasmaGenerator.DrawPlasma(matrix, seed, min, max);
+                PlasmaGenerator.DrawPlasma(matrix, seed, roughness);
             }
 
             return matrix.GetValue(x, y);
@@ -61,7 +54,7 @@ namespace PCG
 
         public override string ToString()
         {
-            return NAME + " " + size + "x" + size + " -> [" + min + ".." + max + "]";
+            return NAME + " " + size + "x" + size;
         }
     }
 }

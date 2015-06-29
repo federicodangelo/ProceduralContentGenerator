@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   functionText: PerlinNoiseMatrix
-  extraParameters: size=256,seed=1,frq=8,amp=1,octnum=1
+  extraParameters: size=256,seed=37,frq=63,amp=1,octnum=1
 --- !u!114 &187073323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   functionText: MidPointMatrix
-  extraParameters: size=256,seed=0,min=0,max=256
+  extraParameters: size=512,seed=19
 --- !u!1 &1391536973
 GameObject:
   m_ObjectHideFlags: 0

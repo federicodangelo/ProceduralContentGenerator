@@ -54,7 +54,7 @@ namespace PCG
                 //Input
                 new ParameterDefinition[] { },
                 //Output
-                "x", size, Int32.MinValue, Int32.MaxValue
+                "x", size, 0, 255
             )
         {
             this.seed = seed;
@@ -110,7 +110,7 @@ namespace PCG
 
         public override string ToString()
         {
-            return NAME + " " + size + "x" + size + " -> [0..255]";
+            return NAME + " " + size + "x" + size;
         }
     }
 }
