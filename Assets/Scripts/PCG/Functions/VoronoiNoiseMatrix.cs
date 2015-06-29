@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_FIXED
+
+using System;
 
 namespace PCG
 {
@@ -28,8 +30,12 @@ namespace PCG
         private CombinatorFunction combinatorFunction;
         private DistanceFunction distanceFunction;
 
-        //private VoronoiNoise generator;
+        
+#if USE_FIXED
         private VoronoiNoiseFixed generator;
+#else
+        private VoronoiNoise generator;
+#endif
         
         public int Seed
         {
@@ -107,7 +113,11 @@ namespace PCG
         {
             if (generator == null)
             {
+#if USE_FIXED
                 generator = new VoronoiNoiseFixed(seed);
+#else
+                generator = new VoronoiNoise(seed);
+#endif
 
                 switch(combinatorFunction)
                 {
@@ -137,7 +147,11 @@ namespace PCG
                 
             }
 
+#if USE_FIXED
             return min + (generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp)) * fint.CreateFromInt(max - min)).ToInt();
+#else
+            return min + (int) (generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min));
+#endif
         }
 
         public override string ToString()

@@ -43,9 +43,15 @@ namespace PCG
 
         }
 
-        fint FADE(fint t) { return t * t * t * (t * (t * fint.CreateFromInt(6) - fint.CreateFromInt(15)) + fint.CreateFromInt(10)); }
+        static fint FADE(fint t) 
+        { 
+            return t * t * t * (t * (t * fint.CreateFromInt(6) - fint.CreateFromInt(15)) + fint.CreateFromInt(10)); 
+        }
 
-        fint LERP(fint t, fint a, fint b) { return (a) + (t) * ((b) - (a)); }
+        static fint LERP(fint t, fint a, fint b) 
+        { 
+            return (a) + (t) * ((b) - (a)); 
+        }
 
         /*
         fint GRAD1(int hash, fint x)
@@ -122,6 +128,8 @@ namespace PCG
         }
         */
 
+        static private fint f0507 = fint.CreateFromInt(507) / fint.CreateFromInt(1000);
+
         fint Noise2D(fint x, fint y)
         {
             //returns a noise value between -0.75 and 0.75
@@ -152,7 +160,7 @@ namespace PCG
 
             n1 = LERP(t, nx0, nx1);
 
-            return fint.half * LERP(s, n0, n1); // 0.507f * LERP(s, n0, n1);
+            return f0507 * LERP(s, n0, n1); // 0.507f * LERP(s, n0, n1);
         }
 
         /*
@@ -223,14 +231,17 @@ namespace PCG
         }
         */
 
-        public fint FractalNoise2D(fint x, fint y, int octNum, fint frq, fint amp)
+        public fint FractalNoise2D(int x, int y, int octNum, fint frq, fint amp)
         {
             fint gain = fint.one;
             fint sum = fint.zero;
 
+            fint fx = fint.CreateFromInt(x);
+            fint fy = fint.CreateFromInt(y);
+
             for (int i = 0; i < octNum; i++)
             {
-                sum += Noise2D(x * gain / frq, y * gain / frq) * amp / gain;
+                sum += Noise2D(fx * gain / frq, fy * gain / frq) * amp / gain;
                 gain *= fint.two;
             }
             return sum;

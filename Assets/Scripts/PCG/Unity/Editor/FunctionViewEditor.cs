@@ -73,7 +73,15 @@ public class PCGViewEditor : Editor
                     }
                 }
 
+                System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
+
+                sw.Start();
+
                 result = function.Evaluate();
+
+                sw.Stop();
+
+                Debug.Log("FunctionViewEditor -> " + fullFunctionText + " execution took " + sw.Elapsed);
             }
             else
             {
@@ -124,6 +132,9 @@ public class PCGViewEditor : Editor
         {
             EditorGUILayout.LabelField("Result", result.ToString());
         }
+
+        if (GUILayout.Button("Recalculate"))
+            cachedFunctionResults.RemoveAll(x => x.Key == fullFunctionText);
     }
 }
 

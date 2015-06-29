@@ -1,4 +1,6 @@
-﻿using System;
+﻿#define USE_FIXED
+
+using System;
 
 namespace PCG
 {
@@ -13,7 +15,11 @@ namespace PCG
         private float frq;
         private float amp;
 
+#if USE_FIXED
+        private PerlinNoiseFixed generator;
+#else
         private PerlinNoise generator;
+#endif
 
         public int Seed
         {
@@ -76,9 +82,20 @@ namespace PCG
         protected override int OnEvaluateMatrix(Function[] inputValues, int x, int y)
         {
             if (generator == null)
+            {
+#if USE_FIXED
+                generator = new PerlinNoiseFixed(seed);
+#else
                 generator = new PerlinNoise(seed);
+#endif
 
-            return min + (int)(generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min));
+            }
+
+#if USE_FIXED
+            return min + (generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp)) * fint.CreateFromInt(max - min)).ToInt();
+#else
+            return min + (int) ((generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min)));
+#endif
         }
 
         public override string ToString()
