@@ -92,9 +92,24 @@ namespace PCG
             }
 
 #if USE_FIXED
-            return min + (generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp)) * fint.CreateFromInt(max - min)).ToInt();
+            //return min + (generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp)) * fint.CreateFromInt(max - min)).ToInt();
+            int noise = generator.FractalNoise2D(x, y, octNum, ((int)frq) << PerlinNoiseFixed.SHIFT_AMOUNT, ((int)amp) << PerlinNoiseFixed.SHIFT_AMOUNT);
+
+            //noise = (noise * ((max - min) << PerlinNoiseFixed.SHIFT_AMOUNT)) >> PerlinNoiseFixed.SHIFT_AMOUNT;
+
+            //noise = (noise * (max - min)) >> PerlinNoiseFixed.SHIFT_AMOUNT;
+
+            //We asume (max - min) = 256
+            noise = noise >> (PerlinNoiseFixed.SHIFT_AMOUNT - 8);
+
+            //noise += min;
+
+            return noise;
+                
 #else
-            return min + (int) ((generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min)));
+            //return min + (int) ((generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min)));
+            //We asume (max - min) = 256
+            return (int) (generator.FractalNoise2D(x, y, octNum, frq, amp) * 255.0f);
 #endif
         }
 

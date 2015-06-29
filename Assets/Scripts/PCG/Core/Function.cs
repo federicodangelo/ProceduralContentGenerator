@@ -89,8 +89,8 @@ namespace PCG
 
             Matrix matrix = new Matrix(size);
 
-            for (int x = 0; x < size; x++)
-                for (int y = 0; y < size; y++)
+            for (int y = 0; y < size; y++)
+                for (int x = 0; x < size; x++)
                     matrix.SetValue(x, y, (byte) EvaluateMatrix(x, y));
 
             return matrix;

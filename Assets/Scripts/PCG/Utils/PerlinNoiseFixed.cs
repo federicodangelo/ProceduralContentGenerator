@@ -15,8 +15,13 @@ namespace PCG
 {
     public class PerlinNoiseFixed
     {
-        const int B = 256;
-        int[] m_perm = new int[B + B];
+        public const int SHIFT_AMOUNT = 10; //Overflows above 10, and doesn't work below 8
+
+        private const int one = 1 << SHIFT_AMOUNT;
+        private const int decimalPartMask = (1 << SHIFT_AMOUNT) - 1;
+
+        private const int B = 256;
+        private int[] m_perm = new int[B + B];
 
         public PerlinNoiseFixed(int seed)
         {
@@ -43,14 +48,21 @@ namespace PCG
 
         }
 
-        static fint FADE(fint t) 
+        //Fade values in the 0-1 range
+        static int FADE01(int t) 
         { 
-            return t * t * t * (t * (t * fint.CreateFromInt(6) - fint.CreateFromInt(15)) + fint.CreateFromInt(10)); 
+            //return t * t * t * (t * (t * fint.CreateFromInt(6) - fint.CreateFromInt(15)) + fint.CreateFromInt(10)); 
+            //int p1 = ((((t * t) >> SHIFT_AMOUNT) * t) >> SHIFT_AMOUNT);
+            //int p2 = (((t * (6 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT) - (15 << SHIFT_AMOUNT));
+            //int p3 = (((t * p2) >> SHIFT_AMOUNT) + (10 << SHIFT_AMOUNT));
+            //int p4 = ((p1 * p3) >> SHIFT_AMOUNT);
+            return ((((((t * t) >> SHIFT_AMOUNT) * t) >> SHIFT_AMOUNT) * (((t * (((t * (6 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT) - (15 << SHIFT_AMOUNT))) >> SHIFT_AMOUNT) + (10 << SHIFT_AMOUNT))) >> SHIFT_AMOUNT);
         }
 
-        static fint LERP(fint t, fint a, fint b) 
+        //t between 0 and 1
+        static int LERP(int t, int a, int b) 
         { 
-            return (a) + (t) * ((b) - (a)); 
+            return (a) + (((t) * ((b) - (a))) >> SHIFT_AMOUNT); 
         }
 
         /*
@@ -70,7 +82,7 @@ namespace PCG
         }
         */
 
-        fint GRAD2(int hash, fint x, fint y)
+        int GRAD2(int hash, int x, int y)
         {
             //This method uses the mod operator which is slower 
             //than bitwise operations but is included out of interest
@@ -82,9 +94,10 @@ namespace PCG
             //    	return ((hn != 0) ? -u : u) + ((hm != 0) ? -2.0f*v : 2.0f*v);
 
             int h = hash & 7;
-            fint u = h < 4 ? x : y;
-            fint v = h < 4 ? y : x;
-            return (((h & 1) != 0) ? -u : u) + (((h & 2) != 0) ? -fint.two * v : fint.two * v);
+            int u = h < 4 ? x : y;
+            int v = h < 4 ? y : x;
+            //return (((h & 1) != 0) ? -u : u) + (((h & 2) != 0) ? -(((2 << SHIFT_AMOUNT) * v) >> SHIFT_AMOUNT) : (((2 << SHIFT_AMOUNT) * v) >> SHIFT_AMOUNT));
+            return (((h & 1) != 0) ? -u : u) + (((h & 2) != 0) ? ((-v) << 1) : (v << 1)); //Multiply by 2 -> 1 bit shift!
         }
 
         /*
@@ -128,27 +141,27 @@ namespace PCG
         }
         */
 
-        static private fint f0507 = fint.CreateFromInt(507) / fint.CreateFromInt(1000);
+        static private int f0507 = one / 2;// // fint.CreateFromInt(507) / fint.CreateFromInt(1000);
 
-        fint Noise2D(fint x, fint y)
+        int Noise2D(int x, int y)
         {
             //returns a noise value between -0.75 and 0.75
             int ix0, iy0, ix1, iy1;
-            fint fx0, fy0, fx1, fy1, s, t, nx0, nx1, n0, n1;
+            int fx0, fy0, fx1, fy1, s, t, nx0, nx1, n0, n1;
 
-            ix0 = (int)x.ToInt(); 	// Integer part of x
-            iy0 = (int)y.ToInt(); 	// Integer part of y
-            fx0 = fint.CreateRaw(x.raw & fint.decimalPartMask); //x - ix0;        	// Fractional part of x
-            fy0 = fint.CreateRaw(y.raw & fint.decimalPartMask); //y - iy0;        	// Fractional part of y
-            fx1 = fx0 - fint.one;
-            fy1 = fy0 - fint.one;
+            ix0 = x >> SHIFT_AMOUNT; 	// Integer part of x
+            iy0 = y >> SHIFT_AMOUNT; 	// Integer part of y
+            fx0 = x & decimalPartMask; //x - ix0;        	// Fractional part of x
+            fy0 = y & decimalPartMask; //y - iy0;        	// Fractional part of y
+            fx1 = fx0 - one;
+            fy1 = fy0 - one;
             ix1 = (ix0 + 1) & 0xff; // Wrap to 0..255
             iy1 = (iy0 + 1) & 0xff;
             ix0 = ix0 & 0xff;
             iy0 = iy0 & 0xff;
 
-            t = FADE(fy0);
-            s = FADE(fx0);
+            t = FADE01(fy0); //Always between 0 and 1
+            s = FADE01(fx0); //Always between 0 and 1
 
             nx0 = GRAD2(m_perm[ix0 + m_perm[iy0]], fx0, fy0);
             nx1 = GRAD2(m_perm[ix0 + m_perm[iy1]], fx0, fy1);
@@ -160,7 +173,7 @@ namespace PCG
 
             n1 = LERP(t, nx0, nx1);
 
-            return f0507 * LERP(s, n0, n1); // 0.507f * LERP(s, n0, n1);
+            return (f0507 * LERP(s, n0, n1)) >> SHIFT_AMOUNT; // 0.507f * LERP(s, n0, n1);
         }
 
         /*
@@ -231,19 +244,31 @@ namespace PCG
         }
         */
 
-        public fint FractalNoise2D(int x, int y, int octNum, fint frq, fint amp)
+        public int FractalNoise2D(int x, int y, int octNum, int frq, int amp)
         {
-            fint gain = fint.one;
-            fint sum = fint.zero;
+            int gain = 1 << SHIFT_AMOUNT;
+            int sum = 0;
 
-            fint fx = fint.CreateFromInt(x);
-            fint fy = fint.CreateFromInt(y);
+            int fx = x << SHIFT_AMOUNT;
+            int fy = y << SHIFT_AMOUNT;
 
             for (int i = 0; i < octNum; i++)
             {
-                sum += Noise2D(fx * gain / frq, fy * gain / frq) * amp / gain;
-                gain *= fint.two;
+                //sum += (((Noise2D(
+                //    (((fx * gain) >> SHIFT_AMOUNT) << SHIFT_AMOUNT) / frq,
+                //    (((fy * gain) >> SHIFT_AMOUNT) << SHIFT_AMOUNT) / frq
+                //    ) * amp) >> SHIFT_AMOUNT) << SHIFT_AMOUNT) / gain;
+
+                sum += (Noise2D(
+                    (fx * gain) / frq,
+                    (fy * gain) / frq
+                    ) * amp) / gain;
+                    
+                //gain = (gain * (2 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT;
+
+                gain = gain << 1; //Multiply by 2 -> 1 bit shift!
             }
+
             return sum;
         }
 

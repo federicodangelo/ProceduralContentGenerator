@@ -142,7 +142,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   functionText: PerlinNoiseMatrix
-  extraParameters: size=256,seed=33,frq=64,amp=1,octnum=1
+  extraParameters: size=256,seed=1,frq=8,amp=1,octnum=1
 --- !u!114 &187073323
 MonoBehaviour:
   m_ObjectHideFlags: 0
