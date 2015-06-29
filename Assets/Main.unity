@@ -155,7 +155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   functionText: MidPointMatrix
-  extraParameters: size=512,seed=19
+  extraParameters: size=512,seed=19,roughness=2
 --- !u!1 &1391536973
 GameObject:
   m_ObjectHideFlags: 0
