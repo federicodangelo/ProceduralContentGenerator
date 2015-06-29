@@ -9,8 +9,6 @@ namespace PCG
         public const string NAME = "PerlinNoiseMatrix";
 
         private int seed;
-        private int min;
-        private int max;
         private int octNum;
         private float frq;
         private float amp;
@@ -25,18 +23,6 @@ namespace PCG
         {
             get { return seed; }
             set { seed = value; }
-        }
-
-        public int Min
-        {
-            get { return this.min; }
-            set { this.min = value; }
-        }
-
-        public int Max
-        {
-            get { return this.max; }
-            set { this.max = value; }
         }
 
         public int OctNum
@@ -58,11 +44,11 @@ namespace PCG
         }
 
         public PerlinNoiseMatrix()
-            : this(256, 0, 0, 255, 1, 64, 1)
+            : this(256, 0, 1, 64, 1)
         {
         }
 
-        public PerlinNoiseMatrix(int size, int seed, int min, int max, int octNum, float frq, float amp) :
+        public PerlinNoiseMatrix(int size, int seed, int octNum, float frq, float amp) :
             base(
                 NAME,
                 //Input
@@ -72,8 +58,6 @@ namespace PCG
             )
         {
             this.seed = seed;
-            this.min = min;
-            this.max = max;
             this.octNum = octNum;
             this.frq = frq;
             this.amp = amp;
@@ -88,7 +72,6 @@ namespace PCG
 #else
                 generator = new PerlinNoise(seed);
 #endif
-
             }
 
 #if USE_FIXED
@@ -100,22 +83,34 @@ namespace PCG
             //noise = (noise * (max - min)) >> PerlinNoiseFixed.SHIFT_AMOUNT;
 
             //We asume (max - min) = 256
-            noise = noise >> (PerlinNoiseFixed.SHIFT_AMOUNT - 8);
 
-            //noise += min;
+            int noiseInt = noise >> (PerlinNoiseFixed.SHIFT_AMOUNT - 8);
 
-            return noise;
+            //FractalNoise2D returns values in the -0.75 / 0.75 range (for amplitude 1, 1 octave), so remap using that as a reference
+            noiseInt = (((noiseInt + 192) * 2) / 3);
                 
 #else
             //return min + (int) ((generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min)));
             //We asume (max - min) = 256
-            return (int) (generator.FractalNoise2D(x, y, octNum, frq, amp) * 255.0f);
+
+            float noise = generator.FractalNoise2D(x, y, octNum, frq, amp);
+
+            //FractalNoise2D returns values in the -0.75 / 0.75 range (for amplitude 1, 1 octave), so remap using that as a reference
+            int noiseInt = (int) (((noise + 0.75f) / 1.5f) * 255f);
+
 #endif
+
+            if (noiseInt > 255)
+                noiseInt = 255;
+            else if (noiseInt < 0)
+                noiseInt = 0;
+
+            return noiseInt;
         }
 
         public override string ToString()
         {
-            return NAME + " " + size + "x" + size + " -> [" + min + ".." + max + "]";
+            return NAME + " " + size + "x" + size + " -> [0..255]";
         }
     }
 }
