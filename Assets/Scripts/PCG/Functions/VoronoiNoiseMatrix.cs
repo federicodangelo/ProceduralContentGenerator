@@ -1,4 +1,4 @@
-﻿//#define USE_FIXED
+﻿#define USE_FIXED
 
 using System;
 
@@ -130,9 +130,9 @@ namespace PCG
             }
 
 #if USE_FIXED
-            fint noise = generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp));
+            int noise = generator.FractalNoise2D(x, y, octNum, ((int)frq) << VoronoiNoiseFixed.SHIFT_AMOUNT, ((int)amp) << VoronoiNoiseFixed.SHIFT_AMOUNT);
 
-            int intNoise = (noise * fint.CreateFromInt(256)).ToInt();
+            int intNoise = noise >> (PerlinNoiseFixed.SHIFT_AMOUNT - 8);
 
             return intNoise;
 #else

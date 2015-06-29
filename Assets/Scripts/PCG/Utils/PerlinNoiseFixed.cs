@@ -254,19 +254,9 @@ namespace PCG
 
             for (int i = 0; i < octNum; i++)
             {
-                //sum += (((Noise2D(
-                //    (((fx * gain) >> SHIFT_AMOUNT) << SHIFT_AMOUNT) / frq,
-                //    (((fy * gain) >> SHIFT_AMOUNT) << SHIFT_AMOUNT) / frq
-                //    ) * amp) >> SHIFT_AMOUNT) << SHIFT_AMOUNT) / gain;
+                sum += (Noise2D((fx * gain) / frq, (fy * gain) / frq) * amp) / gain;
 
-                sum += (Noise2D(
-                    (fx * gain) / frq,
-                    (fy * gain) / frq
-                    ) * amp) / gain;
-                    
-                //gain = (gain * (2 << SHIFT_AMOUNT)) >> SHIFT_AMOUNT;
-
-                gain = gain << 1; //Multiply by 2 -> 1 bit shift!
+                gain = gain << 1;
             }
 
             return sum;

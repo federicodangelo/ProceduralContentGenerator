@@ -19,10 +19,15 @@ namespace PCG
 {
     public class VoronoiNoiseFixed
     {
+        public const int SHIFT_AMOUNT = 10;
+
+        public const int one = 1 << SHIFT_AMOUNT;
+        public const int decimalPartMask = (1 << SHIFT_AMOUNT) - 1;
+
         //Function delegates, makes using functions pointers easier
-        private delegate fint DISTANCE_FUNC2(fint p1x, fint p1y, fint p2x, fint p2y);
+        private delegate int DISTANCE_FUNC2(int p1x, int p1y, int p2x, int p2y);
         //private delegate fint DISTANCE_FUNC3(fint p1x, fint p1y, fint p1z, fint p2x, fint p2y, fint p2z);
-        private delegate fint COMBINE_FUNC(fint d0, fint d1);
+        private delegate int COMBINE_FUNC(int d0, int d1);
 
         //Function pointer to active distance function and combination function
         private DISTANCE_FUNC2 DistanceFunc2 = EuclidianDistanceFunc2;
@@ -47,37 +52,39 @@ namespace PCG
         }
 
         //Sample 2D fractal noise
-        public fint FractalNoise2D(int x, int y, int octNum, fint frq, fint amp)
+        public int FractalNoise2D(int x, int y, int octNum, int frq, int amp)
         {
-            fint gain = fint.one;
-            fint sum = fint.zero;
+            int gain = 1 << SHIFT_AMOUNT;
+            int sum = 0;
 
-            fint fx = fint.CreateFromInt(x);
-            fint fy = fint.CreateFromInt(y);
+            int fx = x << SHIFT_AMOUNT;
+            int fy = y << SHIFT_AMOUNT;
 
             for (int i = 0; i < octNum; i++)
             {
-                sum += Noise2D(fx * gain / frq, fy * gain / frq) * amp / gain;
-                gain *= fint.two;
+                sum += (Noise2D((fx * gain) / frq, (fy * gain) / frq) * amp) / gain;
+
+                gain = gain << 1;
             }
+
             return sum;
         }
 
         //Sample single octave of 2D noise
-        private fint Noise2D(fint inputX, fint inputY)
+        private int Noise2D(int inputX, int inputY)
         {
             //Declare some values for later use
             uint lastRandom, numberFeaturePoints;
-            fint randomDiffX, randomDiffY, featurePointX, featurePointY;
+            int randomDiffX, randomDiffY, featurePointX, featurePointY;
             int cubeX, cubeY;
 
             //Initialize values in distance array to large values
-            fint m1 = fint.CreateFromInt(6666); //Closest point
-            fint m2 = fint.CreateFromInt(6666); //2nd closest point
+            int m1 = int.MaxValue; //Closest point
+            int m2 = int.MaxValue; //2nd closest point
 
             //1. Determine which cube the evaluation point is in
-            int evalCubeX = (int)inputX.ToInt();
-            int evalCubeY = (int)inputY.ToInt();
+            int evalCubeX = inputX >> SHIFT_AMOUNT;
+            int evalCubeY = inputY >> SHIFT_AMOUNT;
 
             for (int i = -1; i < 2; ++i)
             {
@@ -96,13 +103,13 @@ namespace PCG
                     for (uint l = 0; l < numberFeaturePoints; ++l)
                     {
                         lastRandom = lcgRandom(lastRandom);
-                        randomDiffX = fint.CreateRaw((int)(lastRandom & fint.decimalPartMask)); //(float)lastRandom / 0x100000000; --> random in (0..1) range
+                        randomDiffX = (int) lastRandom & decimalPartMask; //(float)lastRandom / 0x100000000; --> random in (0..1) range
 
                         lastRandom = lcgRandom(lastRandom);
-                        randomDiffY = fint.CreateRaw((int)(lastRandom & fint.decimalPartMask)); //(float)lastRandom / 0x100000000; --> random in (0..1) range
+                        randomDiffY = (int) lastRandom & decimalPartMask; //(float)lastRandom / 0x100000000; --> random in (0..1) range
 
-                        featurePointX = randomDiffX + fint.CreateFromInt(cubeX);
-                        featurePointY = randomDiffY + fint.CreateFromInt(cubeY);
+                        featurePointX = randomDiffX + (cubeX << SHIFT_AMOUNT);
+                        featurePointY = randomDiffY + (cubeY << SHIFT_AMOUNT);
 
                         //5. Find the feature point closest to the evaluation point. 
                         //This is done by inserting the distances to the feature points into a sorted list
@@ -110,7 +117,7 @@ namespace PCG
                         //insert(distanceArray, DistanceFunc2(inputX, inputY, featurePointX, featurePointY));
                         //insert(distanceArray, EuclidianDistanceFunc2(inputX, inputY, featurePointX, featurePointY));
 
-                        fint val = DistanceFunc2(inputX, inputY, featurePointX, featurePointY);
+                        int val = DistanceFunc2(inputX, inputY, featurePointX, featurePointY);
 
                         if (val < m1)
                         {
@@ -130,12 +137,12 @@ namespace PCG
 
             //fint res = CombineFunc(distanceArray[0], distanceArray[1], distanceArray[2]);
 
-            fint res = CombineFunc(m1, m2);
+            int res = CombineFunc(m1, m2);
 
-            if (res > fint.one)
-                res = fint.one;
-            else if (res < fint.zero)
-                res = fint.zero;
+            if (res > one)
+                res = one;
+            else if (res < 0)
+                res = 0;
 
             return res;
         }
@@ -227,47 +234,57 @@ namespace PCG
          */
 
         //2D distance functions
-        private static fint EuclidianDistanceFunc2(fint p1x, fint p1y, fint p2x, fint p2y)
+        private static int EuclidianDistanceFunc2(int p1x, int p1y, int p2x, int p2y)
         {
-            return (p1x - p2x) * (p1x - p2x) + (p1y - p2y) * (p1y - p2y);
+            return 
+                (((p1x - p2x) * (p1x - p2x)) >> SHIFT_AMOUNT) + 
+                (((p1y - p2y) * (p1y - p2y)) >> SHIFT_AMOUNT) ;
         }
 
-        private static fint ManhattanDistanceFunc2(fint p1x, fint p1y, fint p2x, fint p2y)
+        private static int ManhattanDistanceFunc2(int p1x, int p1y, int p2x, int p2y)
         {
-            return FMath.Abs(p1x - p2x) + FMath.Abs(p1y - p2y);
+            return Math.Abs(p1x - p2x) + Math.Abs(p1y - p2y);
         }
 
-        private static fint ChebyshevDistanceFunc2(fint p1x, fint p1y, fint p2x, fint p2y)
+        private static int ChebyshevDistanceFunc2(int p1x, int p1y, int p2x, int p2y)
         {
-            fint dx = p1x - p2x;
-            fint dy = p1y - p2y;
+            int dx = p1x - p2x;
+            int dy = p1y - p2y;
 
-            return FMath.Max(FMath.Abs(dx), FMath.Abs(dy));
+            return Math.Max(Math.Abs(dx), Math.Abs(dy));
         }
 
         //3D distance functions
-        private static fint EuclidianDistanceFunc3(fint p1x, fint p1y, fint p1z, fint p2x, fint p2y, fint p2z)
+        /*
+        private static int EuclidianDistanceFunc3(int p1x, int p1y, int p1z, int p2x, int p2y, int p2z)
         {
-            return (p1x - p2x) * (p1x - p2x) + (p1y - p2y) * (p1y - p2y) + (p1z - p2z) * (p1z - p2z);
+            return 
+                (((p1x - p2x) * (p1x - p2x)) >> SHIFT_AMOUNT) + 
+                (((p1y - p2y) * (p1y - p2y)) >> SHIFT_AMOUNT) + 
+                (((p1z - p2z) * (p1z - p2z)) >> SHIFT_AMOUNT);
         }
 
-        private static fint ManhattanDistanceFunc3(fint p1x, fint p1y, fint p1z, fint p2x, fint p2y, fint p2z)
+        private static int ManhattanDistanceFunc3(int p1x, int p1y, int p1z, int p2x, int p2y, int p2z)
         {
-            return FMath.Abs(p1x - p2x) + FMath.Abs(p1y - p2y) + FMath.Abs(p1z - p2z);
+            return 
+                Math.Abs(p1x - p2x) +
+                Math.Abs(p1y - p2y) +
+                Math.Abs(p1z - p2z);
         }
 
-        private static fint ChebyshevDistanceFunc3(fint p1x, fint p1y, fint p1z, fint p2x, fint p2y, fint p2z)
+        private static int ChebyshevDistanceFunc3(int p1x, int p1y, int p1z, int p2x, int p2y, int p2z)
         {
-            fint dx = p1x - p2x;
-            fint dy = p1y - p2y;
-            fint dz = p1z - p2z;
+            int dx = p1x - p2x;
+            int dy = p1y - p2y;
+            int dz = p1z - p2z;
 
-            return FMath.Max(FMath.Max(FMath.Abs(dx), FMath.Abs(dy)), FMath.Abs(dz));
+            return Math.Max(Math.Max(Math.Abs(dx), Math.Abs(dy)), Math.Abs(dz));
         }
+         */
 
         //Combination functions
-        private static fint CombineFunc_D0(fint d0, fint d1) { return d0; }
-        private static fint CombineFunc_D1_D0(fint d0, fint d1) { return d1 - d0; }
+        private static int CombineFunc_D0(int d0, int d1) { return d0; }
+        private static int CombineFunc_D1_D0(int d0, int d1) { return d1 - d0; }
         //private static fint CombineFunc_D2_D0(fint d0, fint d1, fint d2) { return d2 - d0; }
 
         /// <summary>
