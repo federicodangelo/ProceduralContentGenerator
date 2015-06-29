@@ -93,10 +93,12 @@ namespace PCG
                     for (uint l = 0; l < numberFeaturePoints; ++l)
                     {
                         lastRandom = lcgRandom(lastRandom);
-                        randomDiffX = (float)lastRandom / 0x100000000;
+                        //randomDiffX = (float)lastRandom  / 0x100000000;
+                        randomDiffX = (float)(lastRandom & fint.decimalPartMask) / fint.one.raw; //Changed to match VoronoiNoiseFixed behavior (now they look the same, easier to spot bugs)
 
                         lastRandom = lcgRandom(lastRandom);
-                        randomDiffY = (float)lastRandom / 0x100000000;
+                        //randomDiffY = (float)lastRandom / 0x100000000;
+                        randomDiffY = (float)(lastRandom & fint.decimalPartMask) / fint.one.raw; //Changed to match VoronoiNoiseFixed behavior (now they look the same, easier to spot bugs)
 
                         featurePointX = randomDiffX + (float)cubeX;
                         featurePointY = randomDiffY + (float)cubeY;

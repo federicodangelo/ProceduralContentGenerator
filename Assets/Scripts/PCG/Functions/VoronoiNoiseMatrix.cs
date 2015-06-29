@@ -1,4 +1,4 @@
-﻿#define USE_FIXED
+﻿//#define USE_FIXED
 
 using System;
 
@@ -22,8 +22,6 @@ namespace PCG
         }
        
         private int seed;
-        private int min;
-        private int max;
         private int octNum;
         private float frq;
         private float amp;
@@ -41,18 +39,6 @@ namespace PCG
         {
             get { return seed; }
             set { seed = value; }
-        }
-
-        public int Min
-        {
-            get { return this.min; }
-            set { this.min = value; }
-        }
-
-        public int Max
-        {
-            get { return this.max; }
-            set { this.max = value; }
         }
         
         public int OctNum
@@ -86,11 +72,11 @@ namespace PCG
         }
         
         public VoronoiNoiseMatrix()
-            : this(256, 0, 0, 255, 1, 128, 1, CombinatorFunction.D1_D0, DistanceFunction.Euclidian)
+            : this(256, 0, 1, 128, 1, CombinatorFunction.D1_D0, DistanceFunction.Euclidian)
         {
         }
 
-        public VoronoiNoiseMatrix(int size, int seed, int min, int max, int octNum, float frq, float amp, CombinatorFunction combinatorFunction, DistanceFunction distanceFunction) :
+        public VoronoiNoiseMatrix(int size, int seed, int octNum, float frq, float amp, CombinatorFunction combinatorFunction, DistanceFunction distanceFunction) :
             base(
                 NAME,
                 //Input
@@ -100,8 +86,6 @@ namespace PCG
             )
         {
             this.seed = seed;
-            this.min = min;
-            this.max = max;
             this.octNum = octNum;
             this.frq = frq;
             this.amp = amp;
@@ -143,20 +127,26 @@ namespace PCG
                         generator.SetDistanceToManhattan();
                         break;
                 }
-
-                
             }
 
 #if USE_FIXED
-            return min + (generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp)) * fint.CreateFromInt(max - min)).ToInt();
+            fint noise = generator.FractalNoise2D(x, y, octNum, fint.CreateFromFloat(frq), fint.CreateFromFloat(amp));
+
+            int intNoise = (noise * fint.CreateFromInt(256)).ToInt();
+
+            return intNoise;
 #else
-            return min + (int) (generator.FractalNoise2D(x, y, octNum, frq, amp) * (max - min));
+            float noise = generator.FractalNoise2D(x, y, octNum, frq, amp);
+
+            int intNoise = (int) (noise * 256.0f);
+
+            return intNoise;
 #endif
         }
 
         public override string ToString()
         {
-            return NAME + " " + size + "x" + size + " -> [" + min + ".." + max + "]";
+            return NAME + " " + size + "x" + size;
         }
     }
 }
