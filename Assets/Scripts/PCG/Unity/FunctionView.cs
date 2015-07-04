@@ -5,9 +5,8 @@ using PCG;
 
 public class FunctionView : MonoBehaviour 
 {
+    [Multiline]
     public string functionText;
-
-    public string extraParameters;
 
     public Function GetFunction()
     {

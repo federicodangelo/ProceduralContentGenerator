@@ -99,6 +99,7 @@ GameObject:
   - 114: {fileID: 187073323}
   - 114: {fileID: 187073322}
   - 114: {fileID: 187073324}
+  - 114: {fileID: 187073325}
   m_Layer: 0
   m_Name: FunctionView
   m_TagString: Untagged
@@ -118,7 +119,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   functionText: VoronoiNoiseMatrix
-  extraParameters: 
 --- !u!4 &187073321
 Transform:
   m_ObjectHideFlags: 0
@@ -142,8 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a5ac376b626894468ba4cbaee3c1ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  functionText: PerlinNoiseMatrix
-  extraParameters: size=256,seed=37,frq=63,amp=1,octnum=1
+  functionText: PerlinNoiseMatrix(size=256,seed=38,frq=63,amp=1,octnum=1)
 --- !u!114 &187073323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,8 +154,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a5ac376b626894468ba4cbaee3c1ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  functionText: MidPointMatrix
-  extraParameters: size=256,seed=19,roughness=2
+  functionText: MidPointMatrix(size=256,seed=19,roughness=2)
 --- !u!114 &187073324
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,7 +167,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   functionText: RandomMatrix
-  extraParameters: 
+--- !u!114 &187073325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 187073319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a5ac376b626894468ba4cbaee3c1ec4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  functionText: 'MultiplyMatrix(
+
+    m1=PerlinNoiseMatrix(),
+
+    m2=MidPointMatrix()
+
+    )'
 --- !u!1 &1391536973
 GameObject:
   m_ObjectHideFlags: 0

@@ -22,7 +22,7 @@ public class PCGViewEditor : Editor
         
         Function function = view.GetFunction();
 
-        string fullFunctionText = view.functionText + "(" + view.extraParameters + ")";
+        string fullFunctionText = view.functionText;
 
         object result = null;
 
@@ -39,40 +39,6 @@ public class PCGViewEditor : Editor
         {
             if (function != null)
             {
-                string[] kvParameters = view.extraParameters.Split(new char[] {','}, System.StringSplitOptions.RemoveEmptyEntries);
-
-                for (int i = 0; i < kvParameters.Length; i++ )
-                {
-                    if (kvParameters[i].IndexOf('=') > 0)
-                    {
-                        string[] s = kvParameters[i].Split(new char[] { '=' });
-
-                        if (s.Length == 2)
-                        {
-                            string parameter = s[0];
-                            string value = s[1];
-
-                            PropertyInfo property = function.GetType().GetProperty(parameter, BindingFlags.IgnoreCase | BindingFlags.Instance | BindingFlags.Public);
-
-                            if (property != null)
-                            {
-                                if (property.PropertyType == typeof(int))
-                                {
-                                    int intValue;
-                                    if (int.TryParse(value, out intValue))
-                                        property.SetValue(function, intValue, null);
-                                }
-                                else if (property.PropertyType == typeof(float))
-                                {
-                                    float floatValue;
-                                    if (float.TryParse(value, out floatValue))
-                                        property.SetValue(function, floatValue, null);
-                                }
-                            }
-                        }
-                    }
-                }
-
                 System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
 
                 sw.Start();

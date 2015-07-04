@@ -46,6 +46,8 @@ namespace PCG
         public void SetInputValues(Function[] inputValues)
         {
             this.inputValues = inputValues;
+
+            OnInputValuesSet();
         }
 
         public int GetInputParameterIndex(string name)
@@ -64,7 +66,7 @@ namespace PCG
             this.outputParameter = outputParameter;
         }
 
-        public Function GetInputValue(string name, Function[] inputValues)
+        public Function GetInputValue(string name)
         {
             for (int i = 0; i < inputParameters.Length; i++)
                 if (inputParameters [i].Name == name)
@@ -114,5 +116,10 @@ namespace PCG
         protected abstract int OnEvaluateMatrix(Function[] inputValues, int x, int y);
 
         protected abstract int OnEvaluateMatrixSize(Function[] inputValues);
+
+        protected virtual void OnInputValuesSet()
+        {
+            //Override to handle inputValues
+        }
     }
 }
